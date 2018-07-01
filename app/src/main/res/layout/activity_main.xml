@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <FrameLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/main_left_drawer_layout"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/colorAccent"
+        android:paddingTop="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   动  态 "
+            android:textSize="40sp"
+            android:paddingLeft="40dp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:clickable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   资  料 "
+            android:textSize="40sp"
+            android:paddingLeft="40dp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"
+            android:id="@+id/left_drawer_item_info" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="学习资料"
+            android:textSize="40sp"
+            android:paddingLeft="40dp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   考  试 "
+            android:textSize="40sp"
+            android:paddingLeft="40dp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="个人中心"
+            android:textSize="40sp"
+            android:paddingLeft="40dp"
+            android:paddingTop="10dp"
+            android:textStyle="bold"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="24dp"
+            android:paddingTop="50dp"
+            android:src="@drawable/logo"/>
+    </LinearLayout>
+
+
+</android.support.v4.widget.DrawerLayout>
