@@ -1,4 +1,4 @@
-package bupt.atp.app.adapters;
+package bupt.atp.app.data;
 
 /**
  * Created by tangye on 2018/6/26.
