@@ -61,7 +61,7 @@ public class FTPService extends Service {
     }
 
     public void startDownloadFile(String localPath, String remotePath) {
-        FTPTransferTask task = new FTPTransferTask(remotePath, localPath);
+        FTPTransferTask task = new FTPTransferTask(remotePath, localPath, getApplicationContext());
         task.setStateChangedHandler(stateChangedHandler);
         task.setErrorHandler(transferErrorHandler);
         SimpleThreadPool.execute(task);

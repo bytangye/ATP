@@ -17,20 +17,20 @@ import bupt.atp.app.R;
 import bupt.atp.app.adapters.DataAdapter;
 import bupt.atp.app.data.FileAttribute;
 import bupt.atp.app.ftp.FTPQueryResultHandler;
+import bupt.atp.app.ftp.TransferStateChangedHandler;
 
 
 /**
  * Created by tangye on 2018/6/26.
  */
 
-public class DataFragment extends Fragment implements FTPQueryResultHandler {
+public class DataFragment
+        extends Fragment
+        implements FTPQueryResultHandler, TransferStateChangedHandler {
 
-    private DataAdapter          adapter = null;
-    private PositiveQueryHandler handler = null;
-
-    public DataFragment() {
-        //this.adapter = new DataAdapter(getActivity());
-    }
+    private DataAdapter         adapter           = null;
+    private FTPRequestCommitter queryCommitter    = null;
+    private FTPRequestCommitter downloadCommitter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -38,38 +38,28 @@ public class DataFragment extends Fragment implements FTPQueryResultHandler {
                              Bundle         savedInstanceState) {
 
         View view = inflater.inflate(R.layout.info_layout, container, false);
-
         ListView dirListView = view.findViewById(R.id.info_fragment_listview);
 
         if (adapter == null) { adapter = new DataAdapter(getActivity()); }
 
         dirListView.setAdapter(adapter);
 
-        //todo 点击每个Item的响应
         dirListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(
                     final AdapterView<?> adapterView, View view, int index, long id
             ) {
-
-                Log.d("Item", "Click");
-
                 TextView textView = view.findViewById(R.id.info_listview_textview);
                 final String name = textView.getText().toString();
 
-                for (int j = 0; j < adapter.getCount(); j++) {
+                FileAttribute attr = (FileAttribute) adapter.getItem(index);
+                String path = adapter.getFileSystem().getWorkingDir();
 
-                    FileAttribute attr = (FileAttribute) adapter.getItem(j);
-
-                    if (
-                        attr.getFileName().equals(name) &&
-                        attr.isDirectory()              &&
-                        null != handler
-                    ) {
-                        String path = adapter.getFileSystem().getWorkingDir();
-                        handler.handlePositiveQuery(path + name + "/");
-                        break;
-                    }
+                if (attr.isDirectory() && null != queryCommitter) {
+                    queryCommitter.commit(path + name + "/");
+                }
+                else if (!attr.isDirectory() && null != downloadCommitter) {
+                    downloadCommitter.commit(path + name);
                 }
             }
         });
@@ -78,8 +68,8 @@ public class DataFragment extends Fragment implements FTPQueryResultHandler {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (null == handler) { return; }
-                handler.handlePositiveQuery(adapter.getFileSystem().getWorkingDir());
+                if (null == queryCommitter) { return; }
+                queryCommitter.commit(adapter.getFileSystem().getWorkingDir());
             }
         });
 
@@ -100,11 +90,25 @@ public class DataFragment extends Fragment implements FTPQueryResultHandler {
         });
     }
 
+    @Override
+    public void handleTransferStateChanged(
+            String localPath, String remotePath, int formerState, int state
+    ) {
+        if (STATE_START == formerState && STATE_FINISH == state) {
+            // todo 使用其他应用打开下载下来的文件
+            Log.wtf("DataFragment", "what a fuck. Finished.");
+        }
+    }
+
     public DataAdapter getAdapter() {
         return adapter;
     }
 
-    public void setHandler(PositiveQueryHandler handler) {
-        this.handler = handler;
+    public void setQueryCommitter(FTPRequestCommitter queryCommitter) {
+        this.queryCommitter = queryCommitter;
+    }
+
+    public void setDownloadCommitter(FTPRequestCommitter downloadCommitter) {
+        this.downloadCommitter = downloadCommitter;
     }
 }

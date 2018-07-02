@@ -12,7 +12,7 @@ public interface TransferStateChangedHandler {
     int STATE_FINISH  = 3;
 
     void handleTransferStateChanged(
-            String localName, String remoteName,
-            int formerState, int state
+            String localPath  , String remotePath,
+            int    formerState, int    state
     );
 }

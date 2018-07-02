@@ -1,9 +1,9 @@
 package bupt.atp.app.ftp;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
+import android.content.Context;
 
-import java.io.FileOutputStream;
+import org.apache.commons.net.ftp.FTPClient;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -20,13 +20,15 @@ public class FTPTransferTask extends FTPRequestTask {
     private FTPErrorHandler             errorHandler        = null;
     private TransferStateChangedHandler stateChangedHandler = null;
 
-    private String localPath;
+    private String localFileName;
+    private Context context;
 
     private static FTPClientFactory factory = FTPClientFactory.getInstance();
 
-    public FTPTransferTask(String target, String localPath) {
+    public FTPTransferTask(String target, String localFileName, Context context) {
         super(target);
-        this.localPath = localPath;
+        this.localFileName = localFileName;
+        this.context       = context;
     }
 
     @Override
@@ -36,20 +38,21 @@ public class FTPTransferTask extends FTPRequestTask {
 
         try {
             client = factory.createClient();
-            reply = client.getReply();
-            if (!FTPReply.isPositiveCompletion(reply)) {
-                throw new IOException("Not positive complete");
-            }
+            client.enterLocalPassiveMode();
+//            reply = client.getReply();
+//            if (!FTPReply.isPositiveCompletion(reply)) {
+//                throw new IOException("Not positive complete");
+//            }
 
             if (null != stateChangedHandler) {
                 stateChangedHandler.handleTransferStateChanged(
-                        localPath, getTarget(), STATE_NONE, STATE_START
+                        localFileName, getTarget(), STATE_NONE, STATE_START
                 );
             }
 
             /* 默认本地不存在同名文件 */
-            OutputStream outputStream = new FileOutputStream(localPath, false);
-
+            //OutputStream outputStream = new FileOutputStream(localFileName, false);
+            OutputStream outputStream = context.openFileOutput(localFileName, Context.MODE_APPEND);
             if (!client.retrieveFile(getTarget(), outputStream)) {
                 throw new IOException("Function retrieveFile() failed to invoke.");
             }
@@ -59,7 +62,7 @@ public class FTPTransferTask extends FTPRequestTask {
 
                 if (null != stateChangedHandler) {
                     stateChangedHandler.handleTransferStateChanged(
-                            localPath, getTarget(), STATE_START, STATE_FINISH
+                            localFileName, getTarget(), STATE_START, STATE_FINISH
                     );
                 }
             }
