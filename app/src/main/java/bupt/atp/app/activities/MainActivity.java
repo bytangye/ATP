@@ -15,8 +15,9 @@ import android.widget.TextView;
 
 import bupt.atp.app.R;
 import bupt.atp.app.activities.fragments.DataFragment;
+import bupt.atp.app.activities.fragments.DownloadRequestCommitter;
+import bupt.atp.app.activities.fragments.FTPRequestCommitter;
 import bupt.atp.app.activities.fragments.PersonalCenterFragment;
-import bupt.atp.app.activities.fragments.PositiveQueryHandler;
 import bupt.atp.app.services.FTPService;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,13 +33,16 @@ public class MainActivity extends AppCompatActivity {
 
             ftpService = ((bupt.atp.app.services.FTPService.InnerBinder) iBinder).getService();
             ftpService.setQueryResultHandler(dataFragment);
+            ftpService.setStateChangedHandler(dataFragment);
 
-            dataFragment.setHandler(new PositiveQueryHandler() {
+            dataFragment.setQueryCommitter(new FTPRequestCommitter() {
                 @Override
-                public void handlePositiveQuery(String path) {
+                public void commit(String path) {
                     ftpService.startQueryFiles(path);
                 }
             });
+
+            dataFragment.setDownloadCommitter(new DownloadRequestCommitter(ftpService));
         }
 
         @Override
@@ -49,14 +53,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable throwable) {
-                Log.wtf("Main", "[Thread" + thread.getId()  + "]", throwable);
+                Log.wtf("MainActivity", "[Thread" + thread.getId()  + "]", throwable);
             }
-        };
-
-        Thread.setDefaultUncaughtExceptionHandler(handler);
+        });
 
         setContentView(R.layout.activity_main);
         TextView textView = (TextView) findViewById(R.id.left_drawer_item_info);
@@ -73,12 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
            @Override
            public void onClick(View view) {
-               //dataFragment = new DataFragment();
-
-//               dataFragment.setFragmentRefresh(MainActivity.this);
-//
-//               dataFragment.setListener(MainActivity.this);
-
                FragmentManager fragmentManager = getFragmentManager();
                FragmentTransaction transaction = fragmentManager.beginTransaction();
                transaction.replace(R.id.main_layout, dataFragment);
@@ -96,34 +92,6 @@ public class MainActivity extends AppCompatActivity {
            }
         });
     }
-
-//    @Override
-//    public void onDictChanged(final List<FileAttribute> attrs) {
-//        if(dataFragment != null) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    dataFragment.updateList(attrs);
-//                }
-//            });
-//        }
-//    }
-//
-//    @Override
-//    public void onSearchNewDict(String path) {
-//        ftpService.startQueryFiles(path);
-//        Log.d("MaintActivity", "New Dict");
-//    }
-//
-//    @Override
-//    public void onReflashClick(final String path) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                ftpService.startQueryFiles(path);
-//            }
-//        });
-//    }
 
     @Override
     public void onBackPressed() {
