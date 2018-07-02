@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class FTPClientFactory {
 
-    private static final String HOST_NAME = "192.168.1.103";
+    private static final String HOST_NAME = "10.28.205.71";
     private static final String USER_NAME = "ty";
     private static final String PASSWORD = "3856";
 

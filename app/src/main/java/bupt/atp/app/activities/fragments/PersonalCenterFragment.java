@@ -1,4 +1,4 @@
-package bupt.atp.app.fragments;
+package bupt.atp.app.activities.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;

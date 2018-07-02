@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bupt.atp.app.adapters.FileAttribute;
+import bupt.atp.app.data.FileAttribute;
 
 
 /**
@@ -39,10 +39,10 @@ public class FTPQueryTask extends FTPRequestTask {
             }
 
             //todo check reply code
-//            reply = client.getReply();
-//            if (!FTPReply.isPositiveCompletion(reply)) {
-//                throw new IOException("Not positive complete");
-//            }
+
+            if (null == resultHandler || !client.isConnected()) { return; }
+
+            client.enterLocalPassiveMode();
 
             FTPFile[] files = client.listFiles(getTarget());
 
@@ -50,10 +50,8 @@ public class FTPQueryTask extends FTPRequestTask {
             for (FTPFile each : files) {
                 attrs.add(new FileAttribute(each.getName(), each.isDirectory()));
             }
-
-            if (null != resultHandler) {
-                resultHandler.handleQueryResult(attrs);
-            }
+            
+            resultHandler.handleQueryResult(getTarget(), attrs);
         }
 
         catch (IOException ex) {
